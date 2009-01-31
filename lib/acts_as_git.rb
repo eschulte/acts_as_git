@@ -1,36 +1,22 @@
 module ActiveFile
   module Acts
-    module Git
+    module GitControlled
       require 'git'
 
       def self.included(base)
-        base.extend ActiveFile::Acts::Git::ClassMethods
-        # overwrite/wrap some methods
-        # this may be a good place to override methods
+        base.extend ActiveFile::Acts::GitControlled::ClassMethods
+        base.send(:after_write, :initialize_git)
       end
 
       module ClassMethods
-        # ActiveFile objects which are located at the top of a git
-        # repository
-        def acts_as_git_repo
-          return if self.included_modules.include?(ActiveFile::Acts::Git::RepoInstanceMethods)
-          send(:include, ActiveFile::Acts::Git::RepoInstanceMethods)
-        end
-
         # ActiveFile objects which live inside of a git repository
         def acts_as_git
-          return if self.included_modules.include?(ActiveFile::Acts::Git::InstanceMethods)
-          send(:include, ActiveFile::Acts::Git::InstanceMethods)
+          return if self.included_modules.include?(ActiveFile::Acts::GitControlled::InstanceMethods)
+          send(:include, ActiveFile::Acts::GitControlled::InstanceMethods)
         end
       end
 
-      module RepoInstanceMethods
-        @git
-        def git() @git end
-        def git=(git) @git = git end
-      end
-
-      ## methods no Git::Base
+      ## methods on Git::Base
       #
       # - cat file
       # - checkout_file: checkout an old version of a file
@@ -42,11 +28,23 @@ module ActiveFile
       # - pull:
 
       module InstanceMethods
-
+        @git
+        def git() @git end
+        def git=(git) @git = git end
+        
+        def initialize_git
+          # set @git to the git repo for self
+          if self.class.directory?
+            @git = Git.init(self.full_path)
+          else
+            # find the containing repo for an element
+            
+          end
+        end
+        
         # Return the information on the last commit at which this file
         # was changed.
         def last_commit
-
         end
         alias :last_update :last_commit
 
@@ -63,7 +61,20 @@ module ActiveFile
         # Return the commit message of the last update
         def last_update_message
         end
-
+        
+        # pass missing methods on through to Git
+        def method_missing(id, *args)
+          if @git and @git.respond_to?(id)
+            if args.size > 0
+              @git.send(id, args)
+            else
+              @git.send(id)
+            end
+          else
+            super(id, args)
+          end
+        end
+        
       end
     end
   end
