@@ -5,7 +5,6 @@ module ActiveFile
 
       def self.included(base)
         base.extend ActiveFile::Acts::GitControlled::ClassMethods
-        base.send(:after_write, :initialize_git)
       end
 
       module ClassMethods
@@ -29,7 +28,10 @@ module ActiveFile
 
       module InstanceMethods
         @git
-        def git() @git end
+        def git()
+          initialize_git unless @git
+          @git
+        end
         def git=(git) @git = git end
         
         def initialize_git
@@ -64,7 +66,7 @@ module ActiveFile
         
         # pass missing methods on through to Git
         def method_missing(id, *args)
-          if @git and @git.respond_to?(id)
+          if self.git and @git.respond_to?(id)
             if args.size > 0
               @git.send(id, args)
             else
