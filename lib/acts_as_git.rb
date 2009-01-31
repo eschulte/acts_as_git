@@ -5,6 +5,7 @@ module ActiveFile
 
       def self.included(base)
         base.extend ActiveFile::Acts::GitControlled::ClassMethods
+        base.send(:after_write, :initialize_new_repo)
       end
 
       module ClassMethods
@@ -13,6 +14,7 @@ module ActiveFile
           return if self.included_modules.include?(ActiveFile::Acts::GitControlled::InstanceMethods)
           send(:include, ActiveFile::Acts::GitControlled::InstanceMethods)
         end
+        attr_accessor :git_ignore
       end
 
       ## methods on Git::Base
@@ -37,7 +39,7 @@ module ActiveFile
         def initialize_git
           # set @git to the git repo for self
           if self.class.directory?
-            @git = Git.init(self.full_path)
+            @git = Git.init(self.full_path) # TODO: maybe change init to open
           else
             # find the containing repo for an element
             # recurse up the directory tree until one is a git repo.
@@ -49,6 +51,22 @@ module ActiveFile
             end
             @git
           end
+        end
+        
+        def initialize_new_repo
+          return self.git unless self.class.directory?
+          root = self.full_path
+          # create .gitignore
+          File.open(File.join(root, ".gitignore"), "w") do |file|
+            self.class.git_ignore.each do |to_ignore|
+              file << to_ignore+"\n"
+            end
+          end
+          # initialize
+          @git = Git.init(self.full_path)
+          @git.add
+          @git.commit("initial commit")
+          @git
         end
         
         ## How to display a single file's history
