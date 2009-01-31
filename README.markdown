@@ -23,7 +23,12 @@ From the root of your rails project execute the following
 
 > ruby script/plugin install git://github.com/eschulte/acts\_as\_git.git
 
-This plugin requires the [Ruby/Git](http://jointheconversation.org/rubygit/) gem
+Or if you are using git for version control and you'd rather include
+this as a submodule execute the following
+
+> git submodule add git://github.com/eschulte/acts\_as\_git.git vendor/plugins/acts\_as\_git
+
+In either case this plugin requires the [Ruby/Git](http://jointheconversation.org/rubygit/) gem
 
 > gem install git
 
