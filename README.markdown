@@ -6,15 +6,10 @@ ActsAsGit
 ==========
 
 Allows ActiveFile models to interact with git repositories.  This adds
-history, attribution, change-logs, rollbacks, and many of the useful
-features of git to ActiveFile objects.
+versioning, history, attribution, diffs, checkout of previous
+versions, and all of the useful features of git to ActiveFile objects.
 
-The two main methods are
-
-- *acts\_as\_git\_repo*: for ActiveFile objects which are located at
-  the top of git repositories
-- *acts_as_git*: for ActiveFile objects which live inside of a git
-  repository
+For information on git see [git](http://git-scm.com/)
 
 Installation
 ============

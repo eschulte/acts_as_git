@@ -100,14 +100,14 @@ module ActiveFile
           self.git.log.path(self.full_path)
         end
         def commit_history_directory
-          self.git.log.path(self.full_path)
+          self.git.log
         end
         alias :history :commit_history
         
         # Return the information on the last commit at which this file
         # was changed.
         def last_commit
-          self.history.first
+          self.commit_history.first
         end
 
         # Return the time at which this file was last commitd
@@ -127,11 +127,48 @@ module ActiveFile
           self.last_commit.message
         end
         
+        # return the text of self at the specified revision
+        #
+        # revisionish can be a revision specification like any of the
+        # following...
+        #
+        # a head specification
+        #   HEAD
+        #   HEAD~1
+        #   HEAD~3
+        #
+        # a hash sha
+        #   05e8468
+        def at_revision(revisionish)
+          self.cat_file(revisionish+":"+self.rel_path)
+        end
+        
+        ## path stuff
+        
+        # return the path to the root of the git directory
+        def git_root
+          self.git.dir.path
+        end
+        
+        # return the path to self inside of the containing git
+        # directory (see git_root)
+        def rel_path
+          rel_path = false
+          base_path = self.full_path
+          root_path = self.git_root
+          until root_path == base_path
+            path_arr = File.split(base_path)
+            rel_path = rel_path ? File.join(rel_path, path_arr.last) : path_arr.last
+            base_path = path_arr.first
+          end
+          rel_path
+        end
+        
         # pass missing methods on through to Git
         def method_missing(id, *args)
           if self.git and @git.respond_to?(id)
             if args.size > 0
-              @git.send(id, args)
+              @git.send(id, *args)
             else
               @git.send(id)
             end
