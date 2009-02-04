@@ -107,7 +107,7 @@ module ActiveFile
         # Return the information on the last commit at which this file
         # was changed.
         def last_commit
-          self.commit_history.first
+          self.commit_history.first rescue nil
         end
 
         # Return the time at which this file was last commitd
