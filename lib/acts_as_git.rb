@@ -45,11 +45,10 @@ module ActiveFile
             # recurse up the directory tree until one is a git repo.
             @git = nil
             dir = File.dirname(self.full_path)
-            until @git
-              @git = Git.init(dir)
+            until File.exist?(File.join(dir, ".git"))
               dir = File.join(dir, "..")
             end
-            @git
+            @git = Git.init(dir)
           end
         end
         
@@ -153,15 +152,7 @@ module ActiveFile
         # return the path to self inside of the containing git
         # directory (see git_root)
         def rel_path
-          rel_path = false
-          base_path = self.full_path
-          root_path = self.git_root
-          until root_path == base_path
-            path_arr = File.split(base_path)
-            rel_path = rel_path ? File.join(rel_path, path_arr.last) : path_arr.last
-            base_path = path_arr.first
-          end
-          rel_path
+          $1 if self.full_path.match(self.git_root+"/?(.*)$")
         end
         
         # pass missing methods on through to Git
