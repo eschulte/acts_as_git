@@ -45,4 +45,15 @@ module Git
       end.join("\n")
     end
   end
+  
+  class Lib
+    # calls git log with the --graph option
+    def graph(starting_point = false)
+      if starting_point
+        command('log', ["--graph", "#{starting_point}..HEAD"])
+      else
+        command('log', ['--graph'])
+      end
+    end
+  end
 end
