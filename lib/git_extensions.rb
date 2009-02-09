@@ -56,4 +56,25 @@ module Git
       end
     end
   end
+  
+  class Base
+    
+    @gitignored = nil
+    
+    def init_ignored
+      @gitignored ||= File.read(File.join((self.dir.path), ".gitignore")).map{ |l| l.chomp }
+    end
+    
+    # uses the values of .gitignore to decide whether the given
+    # rel_path (path relative to the base of the git directory)
+    # matches the .gitignore file
+    def ignore?(rel_path)
+      init_ignored
+      if @gitignored.map{|glob| true if File.fnmatch?(glob, rel_path)}.compact.size > 0
+        true
+      end
+    end
+    alias :ignored? :ignore?
+    
+  end
 end

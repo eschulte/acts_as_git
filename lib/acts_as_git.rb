@@ -5,7 +5,6 @@ module ActiveFile
 
       def self.included(base)
         base.extend ActiveFile::Acts::GitControlled::ClassMethods
-        base.send(:after_write, :initialize_new_repo)
       end
 
       module ClassMethods
@@ -50,22 +49,6 @@ module ActiveFile
             end
             @git = Git.init(dir)
           end
-        end
-        
-        def initialize_new_repo
-          return self.git unless self.class.directory?
-          root = self.full_path
-          # create .gitignore
-          File.open(File.join(root, ".gitignore"), "w") do |file|
-            self.class.git_ignore.each do |to_ignore|
-              file << to_ignore+"\n"
-            end
-          end
-          # initialize
-          @git = Git.init(self.full_path)
-          @git.add
-          @git.commit("initial commit")
-          @git
         end
         
         ## How to display a single file's history
@@ -140,6 +123,17 @@ module ActiveFile
         #   05e8468
         def at_revision(revisionish)
           self.cat_file(revisionish+":"+self.rel_path)
+        end
+
+        def save_and_commit(message)
+          if self.save
+            self.stage
+            self.commit(message)
+          end
+        end
+        
+        def stage
+          self.git.add(self.rel_path)
         end
         
         ## path stuff
