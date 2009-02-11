@@ -124,7 +124,14 @@ module ActiveFile
         def at_revision(revisionish)
           self.cat_file(revisionish+":"+self.rel_path)
         end
-
+        
+        # Checkout the version of self at revisionish overwriting the
+        # current version of self.  This uses the git checkout command.
+        def checkout_at(revisionish)
+          self.checkout_file(revisionish, self.rel_path)
+        end
+        alias :revert :checkout_at
+        
         def save_and_commit(message)
           if self.save
             self.stage
