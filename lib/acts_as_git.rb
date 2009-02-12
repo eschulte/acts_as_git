@@ -139,6 +139,13 @@ module ActiveFile
           end
         end
         
+        def destroy_and_commit(message)
+          if self.destroy
+            self.stage
+            self.commit_all(message)
+          end
+        end
+        
         def stage
           self.git.add(self.rel_path)
         end
