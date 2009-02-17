@@ -1,8 +1,8 @@
 module ActiveFile
   module Acts
     module GitControlled
-      require 'git'
-
+      require File.join(File.dirname(__FILE__), '..', 'ruby-git', 'lib', 'git')
+      
       def self.included(base)
         base.extend ActiveFile::Acts::GitControlled::ClassMethods
       end
@@ -132,17 +132,17 @@ module ActiveFile
         end
         alias :revert :checkout_at
         
-        def save_and_commit(message)
+        def save_and_commit(message, options = {})
           if self.save
             self.stage
-            self.commit(message)
+            self.commit(message, options)
           end
         end
         
-        def destroy_and_commit(message)
+        def destroy_and_commit(message, options = {})
           if self.destroy
             self.stage
-            self.commit_all(message)
+            self.commit_all(message, options)
           end
         end
         
