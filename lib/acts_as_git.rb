@@ -141,7 +141,6 @@ module ActiveFile
         
         def destroy_and_commit(message, options = {})
           if self.destroy
-            self.stage
             self.commit_all(message, options)
           end
         end

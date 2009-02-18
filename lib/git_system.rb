@@ -89,11 +89,11 @@ module GitSystem
     @object = @klass.find(af_id)
     @body = @object.body
     if request.xhr?
-      render(:action => 'edit.rjs')
+      render(:template => 'shared/edit.rjs')
     else
       respond_to do |format|
         format.html do
-          render(:action => 'edit')
+          render(:template => 'shared/edit')
         end
       end
     end
@@ -120,7 +120,7 @@ module GitSystem
     @object = @klass.find(af_id)
     @repo = @object.repo
     if @object.destroy_and_commit("deleting #{@object.rel_path}", :author => user_to_git_author)
-      redirect_to(af_path(:at, @repo))
+      redirect_to(:action => :index)
     else
       flash[:error] = @object.errors.full_messages.to_sentence
       redirect_to(af_path(:show, @object))
