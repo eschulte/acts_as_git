@@ -105,7 +105,8 @@ module GitSystem
     @object.body = params[:body]
     respond_to do |format|
       format.html do
-        if @object.save_and_commit(params[:commit], :author => user_to_git_author)
+        commit = (params[:commit].size > 0) ? params[:commit] : "no commit message"
+        if @object.save_and_commit(commit, :author => user_to_git_author)
           redirect_to(af_path(:show, @object))
         else
           flash[:error] = @object.errors.full_messages.to_sentence
