@@ -76,7 +76,7 @@ module GitSystem
     @klass.new(:path => path)
     if @object.save
       @object.stage
-      @object.commit("initial commit", :author => user_to_git_author)
+      @object.commit("#{@object.path} created", :author => user_to_git_author)
       redirect_to(af_path(:show, @object))
     else
       flash[:error] = @object.errors.full_messages.to_sentence
