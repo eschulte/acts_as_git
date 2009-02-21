@@ -72,15 +72,15 @@ module GitSystem
 
   def create
     guess_class
-    begin
-      path = (af_id.size > 0) ? (af_id + @klass.respond_to?(:extension) ? @klass.extension : '') : params[:path]
-      @object = @klass.create_and_commit(path)
+    path = (af_id.size > 0) ? (af_id + @klass.respond_to?(:extension) ? @klass.extension : '') : params[:path]
+    @klass.new(:path => path)
+    if @object.save
       @object.stage
       @object.commit("initial commit", :author => user_to_git_author)
       redirect_to(af_path(:show, @object))
-    rescue
-      flash[:error] = "<em>#{path}</em> is an invalid path for a new #{@klass.name.humanize}"
-      redirect_to(:controller => :welcome)
+    else
+      flash[:error] = @object.errors.full_messages.to_sentence
+      render(:action => :new)
     end
   end
 

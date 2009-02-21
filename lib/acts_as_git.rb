@@ -36,6 +36,7 @@ module ActiveFile
         def git=(git) @git = git end
         
         def initialize_git
+          return nil unless (self.full_path and (not self.new_p))
           # set @git to the git repo for self
           if self.class.directory?
             @git = Git.init(self.full_path) # TODO: maybe change init to open
