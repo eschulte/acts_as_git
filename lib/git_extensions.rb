@@ -57,13 +57,13 @@ module Git
     # Return the untracked files in the current git repo.
     def untracked
       status = run_command('git status').split("\n")
+      untracked = []
       if index = status.index('# Untracked files:')
-        untracked = []
         status[index..-1].each do |line|
           untracked << $1 if line =~ /^#\t(.*)$/
         end
-        untracked
       end
+      untracked
     end
   end
   
