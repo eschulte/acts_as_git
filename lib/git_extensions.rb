@@ -48,11 +48,21 @@ module Git
   
   class Lib
     # calls git log with the --graph option
-    def graph(starting_point = false)
-      if starting_point
-        command('log', ["--graph", "#{starting_point}..HEAD"])
-      else
-        command('log', ['--graph'])
+    def graph(options = {})
+      command('log', ["--graph",
+                      (options[:pretty] ? "--pretty=#{options[:pretty]}"  : nil),
+                      options[:ref]].compact)
+    end
+
+    # Return the untracked files in the current git repo.
+    def untracked
+      status = run_command('git status').split("\n")
+      if index = status.index('# Untracked files:')
+        untracked = []
+        status[index..-1].each do |line|
+          untracked << $1 if line =~ /^#\t(.*)$/
+        end
+        untracked
       end
     end
   end
@@ -75,6 +85,8 @@ module Git
       end
     end
     alias :ignored? :ignore?
+
+    def untracked() self.lib.untracked end
     
   end
 end

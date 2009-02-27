@@ -80,7 +80,7 @@ module ActiveFile
           end
         end
         def commit_history_entry
-          self.git.log.path(self.full_path)
+          self.git.log.path(self.rel_path)
         end
         def commit_history_directory
           self.git.log
