@@ -87,6 +87,10 @@ module Git
     alias :ignored? :ignore?
 
     def untracked() self.lib.untracked end
+
     
+    def last_commit
+      self.commit_history.first rescue nil
+    end
   end
 end
